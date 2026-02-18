@@ -2,12 +2,17 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Save, Bell } from "lucide-react";
+import { ArrowLeft, Save, Bell, Briefcase } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
-// Gunakan React.use() untuk mengambil params di Next.js terbaru
+const LIME = "#84cc16";
+const LIME_BG = "#f7fee7";
+const LIME_BD = "#bef264";
+
 export default function EditLoker({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
-  const { id } = React.use(params); // Membuka promise params secara aman
+  const { id } = React.use(params);
   const [form, setForm] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -17,7 +22,6 @@ export default function EditLoker({ params }: { params: Promise<{ id: string }> 
       .then((data) => {
         if (data.success && data.data) {
           const app = data.data;
-          // Pengecekan aman agar tidak error 'reading interviewDate of null'
           if (app.interviewDate) {
             app.interviewDate = new Date(app.interviewDate).toISOString().slice(0, 16);
           }
@@ -41,65 +45,106 @@ export default function EditLoker({ params }: { params: Promise<{ id: string }> 
     }
   };
 
-  if (loading) return <div className="p-12 text-center text-slate-500">Memuat data lamaran...</div>;
-  if (!form) return <div className="p-12 text-center text-red-500">Data tidak ditemukan.</div>;
+  if (loading) return (
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <p className="text-sm text-slate-400 font-medium">Memuat data...</p>
+    </div>
+  );
+
+  if (!form) return (
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <p className="text-sm text-red-500">Data tidak ditemukan.</p>
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6 flex justify-center items-start pt-12 text-slate-900">
-      <div className="w-full max-w-xl">
-        <Link href="/" className="flex items-center gap-2 text-slate-500 hover:text-slate-800 mb-6 transition">
-          <ArrowLeft size={20} /> Kembali ke Dashboard
+    <div className="min-h-screen bg-slate-50 p-6 md:p-10 flex justify-center items-start pt-12">
+      <div className="w-full max-w-lg">
+
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-slate-700 mb-8 transition-colors font-medium"
+        >
+          <ArrowLeft size={16} /> Kembali ke Dashboard
         </Link>
-        <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
-          <h1 className="text-2xl font-bold mb-1">Update Progres</h1>
-          <p className="text-slate-500 mb-8">{form.companyName} — {form.position}</p>
 
-          <form onSubmit={handleUpdate} className="space-y-6">
-            <div>
-              <label className="block text-sm font-bold mb-2">Status Lamaran</label>
-              <select
-                className="w-full p-4 rounded-2xl border-2 border-slate-100 outline-none focus:border-blue-500 font-bold text-blue-600 transition"
-                value={form.status}
-                onChange={(e) => setForm({ ...form, status: e.target.value })}
+        <Card className="bg-white border-slate-100 py-0 gap-0 overflow-hidden shadow-sm rounded-2xl">
+          {/* Lime top accent */}
+          <div style={{ height: "3px", background: LIME, borderRadius: "12px 12px 0 0" }} />
+
+          <CardHeader className="px-6 pt-6 pb-0">
+            <div className="flex items-center gap-3 mb-1">
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ background: LIME_BG, border: `1px solid ${LIME_BD}` }}
               >
-                <option value="Rencana">Rencana (Wishlist)</option>
-                <option value="Terkirim">Terkirim (Applied)</option>
-                <option value="Wawancara">Wawancara (Interview)</option>
-                <option value="Diterima">Diterima (Accepted) ✅</option>
-                <option value="Ditolak">Ditolak (Rejected) ❌</option>
-              </select>
-            </div>
-
-            {form.status === 'Wawancara' && (
-              <div className="bg-orange-50 p-5 rounded-2xl border border-orange-100">
-                <label className="flex items-center gap-2 text-sm font-bold text-orange-700 mb-3">
-                  <Bell size={18} /> Jadwal Wawancara
-                </label>
-                <input
-                  type="datetime-local"
-                  className="w-full p-3 rounded-xl border-none outline-none focus:ring-2 focus:ring-orange-500 shadow-sm"
-                  value={form.interviewDate || ""}
-                  onChange={(e) => setForm({ ...form, interviewDate: e.target.value })}
-                />
-                <p className="text-[10px] text-orange-400 mt-2 font-medium">*Bot akan mengirim pengingat WA H-1 ke {form.owner}</p>
+                <Briefcase size={18} style={{ color: LIME }} />
               </div>
-            )}
-
-            <div>
-              <label className="block text-sm font-bold mb-2">Catatan Tambahan</label>
-              <textarea
-                className="w-full p-4 rounded-2xl border outline-none h-32 focus:ring-2 focus:ring-blue-500 transition text-sm"
-                placeholder="Tulis persiapan atau info HRD di sini..."
-                value={form.notes || ""}
-                onChange={(e) => setForm({ ...form, notes: e.target.value })}
-              ></textarea>
+              <div>
+                <CardTitle className="text-lg font-black text-slate-900">Update Progres</CardTitle>
+                <CardDescription className="text-xs text-slate-400 truncate max-w-[260px]">
+                  {form.companyName} — {form.position}
+                </CardDescription>
+              </div>
             </div>
+          </CardHeader>
 
-            <button type="submit" className="w-full bg-slate-900 hover:bg-black text-white font-black py-5 rounded-2xl shadow-xl transition flex justify-center items-center gap-2 uppercase tracking-widest">
-              <Save size={20} /> Simpan Perubahan
-            </button>
-          </form>
-        </div>
+          <CardContent className="px-6 pt-6 pb-6">
+            <form onSubmit={handleUpdate} className="space-y-5">
+
+              <div>
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">
+                  Status Lamaran
+                </label>
+                <select
+                  className="w-full h-10 px-3 rounded-xl text-sm font-semibold bg-slate-50 border border-slate-200 text-slate-700 outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-400"
+                  value={form.status}
+                  onChange={(e) => setForm({ ...form, status: e.target.value })}
+                >
+                  <option value="Rencana">Rencana (Wishlist)</option>
+                  <option value="Terkirim">Terkirim (Applied)</option>
+                  <option value="Wawancara">Wawancara (Interview)</option>
+                  <option value="Diterima">Diterima (Accepted)</option>
+                  <option value="Ditolak">Ditolak (Rejected)</option>
+                </select>
+              </div>
+
+              {form.status === "Wawancara" && (
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                  <label className="flex items-center gap-2 text-xs font-bold text-amber-600 mb-3">
+                    <Bell size={13} /> Jadwal Wawancara
+                  </label>
+                  <input
+                    type="datetime-local"
+                    className="w-full h-9 px-3 rounded-lg text-sm bg-white border border-amber-200 text-slate-700 outline-none focus:border-amber-400"
+                    value={form.interviewDate || ""}
+                    onChange={(e) => setForm({ ...form, interviewDate: e.target.value })}
+                  />
+                </div>
+              )}
+
+              <div>
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">
+                  Catatan Tambahan
+                </label>
+                <textarea
+                  className="w-full px-3 py-2.5 rounded-xl text-sm bg-slate-50 border border-slate-200 text-slate-700 placeholder:text-slate-300 outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-400 h-28 resize-none transition-colors"
+                  placeholder="Tulis persiapan atau info HRD di sini..."
+                  value={form.notes || ""}
+                  onChange={(e) => setForm({ ...form, notes: e.target.value })}
+                />
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full font-bold gap-2 transition-all duration-200 hover:-translate-y-0.5 text-white rounded-xl shadow-sm"
+                style={{ background: LIME, border: "none" }}
+              >
+                <Save size={15} /> Simpan Perubahan
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

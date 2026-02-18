@@ -2,7 +2,14 @@
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Save, Link as LinkIcon, Image as ImageIcon } from "lucide-react";
+import { ArrowLeft, Save, Link as LinkIcon, Image as ImageIcon, Briefcase } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+
+const LIME = "#84cc16";
+const LIME_BG = "#f7fee7";
+const LIME_BD = "#bef264";
 
 function TambahForm() {
   const router = useRouter();
@@ -10,7 +17,9 @@ function TambahForm() {
   const owner = searchParams.get("owner") || "Edi";
 
   const [form, setForm] = useState({
-    companyName: "", position: "", owner: owner, source: "LinkedIn", status: "Terkirim", linkPostingan: "", fotoPoster: "", notes: ""
+    companyName: "", position: "", owner,
+    source: "LinkedIn", status: "Terkirim",
+    linkPostingan: "", fotoPoster: "", notes: ""
   });
 
   const handleSubmit = async (e: any) => {
@@ -21,10 +30,9 @@ function TambahForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-
       if (res.ok) {
-        router.refresh(); // Segarkan data server
-        router.push("/"); // Pindah ke dashboard
+        router.refresh();
+        router.push("/");
       } else {
         const errorData = await res.json();
         alert("Gagal menyimpan: " + errorData.error);
@@ -36,47 +44,129 @@ function TambahForm() {
   };
 
   return (
-    <div className="min-h-screen bg-white p-6 md:p-12 flex justify-center">
-      <div className="w-full max-w-xl">
-        <Link href="/" className="flex items-center gap-2 text-slate-400 hover:text-slate-900 mb-8 transition font-medium">
-          <ArrowLeft size={18} /> Kembali
+    <div className="min-h-screen bg-slate-50 p-6 md:p-10 flex justify-center items-start pt-12">
+      <div className="w-full max-w-lg">
+
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-slate-700 mb-8 transition-colors font-medium"
+        >
+          <ArrowLeft size={16} /> Kembali ke Dashboard
         </Link>
-        <h1 className="text-3xl font-bold mb-2 text-slate-900">Input Baru: {owner}</h1>
-        <p className="text-slate-500 mb-8">Tambahkan detail lamaran kerja yang baru saja dikirim.</p>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="grid gap-5 bg-slate-50 p-6 rounded-3xl border border-slate-100">
-            <input required placeholder="Nama Perusahaan" className="w-full p-4 rounded-2xl border-none outline-none focus:ring-2 focus:ring-blue-500 shadow-sm" onChange={(e) => setForm({ ...form, companyName: e.target.value })} />
-            <input required placeholder="Posisi (Contoh: Web Developer)" className="w-full p-4 rounded-2xl border-none outline-none focus:ring-2 focus:ring-blue-500 shadow-sm" onChange={(e) => setForm({ ...form, position: e.target.value })} />
-          </div>
+        <Card className="bg-white border-slate-100 py-0 gap-0 overflow-hidden shadow-sm rounded-2xl">
+          {/* Lime top accent */}
+          <div style={{ height: "3px", background: LIME, borderRadius: "12px 12px 0 0" }} />
 
-          <div className="space-y-4">
-            <div className="flex items-center gap-3 bg-white p-1 rounded-2xl border px-4">
-              <LinkIcon size={18} className="text-slate-400" />
-              <input placeholder="URL Link Postingan" className="w-full py-4 outline-none text-sm" onChange={(e) => setForm({ ...form, linkPostingan: e.target.value })} />
+          <CardHeader className="px-6 pt-6 pb-0">
+            <div className="flex items-center gap-3 mb-1">
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ background: LIME_BG, border: `1px solid ${LIME_BD}` }}
+              >
+                <Briefcase size={18} style={{ color: LIME }} />
+              </div>
+              <div>
+                <CardTitle className="text-lg font-black text-slate-900">
+                  Tambah Lamaran
+                </CardTitle>
+                <CardDescription className="text-xs font-semibold" style={{ color: LIME }}>
+                  untuk {owner}
+                </CardDescription>
+              </div>
             </div>
-            <div className="flex items-center gap-3 bg-white p-1 rounded-2xl border px-4">
-              <ImageIcon size={18} className="text-slate-400" />
-              <input placeholder="URL Foto/Screenshot Poster" className="w-full py-4 outline-none text-sm" onChange={(e) => setForm({ ...form, fotoPoster: e.target.value })} />
-            </div>
-          </div>
+          </CardHeader>
 
-          <div className="grid grid-cols-2 gap-4">
-            <select className="p-4 rounded-2xl border outline-none bg-white font-medium" onChange={(e) => setForm({ ...form, status: e.target.value })}>
-              <option value="Terkirim">Terkirim</option>
-              <option value="Rencana">Rencana</option>
-              <option value="Wawancara">Wawancara</option>
-            </select>
-            <select className="p-4 rounded-2xl border outline-none bg-white font-medium" onChange={(e) => setForm({ ...form, source: e.target.value })}>
-              <option value="LinkedIn">LinkedIn</option>
-              <option value="Instagram">Instagram</option>
-              <option value="Email">Email</option>
-              <option value="Lainnya">Lainnya</option>
-            </select>
-          </div>
+          <CardContent className="px-6 pt-6 pb-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
 
-          <button type="submit" className="w-full bg-blue-600 text-white font-black py-5 rounded-2xl shadow-xl shadow-blue-100 hover:bg-blue-700 transition">SIMPAN DATA</button>
-        </form>
+              <div className="space-y-3">
+                <div>
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">
+                    Nama Perusahaan *
+                  </label>
+                  <Input
+                    required
+                    placeholder="Contoh: PT Gojek Indonesia"
+                    className="bg-slate-50 border-slate-200 text-slate-800 placeholder:text-slate-300 focus-visible:ring-1 focus-visible:ring-lime-400 focus-visible:border-lime-400 rounded-xl"
+                    onChange={(e) => setForm({ ...form, companyName: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">
+                    Posisi *
+                  </label>
+                  <Input
+                    required
+                    placeholder="Contoh: Frontend Developer"
+                    className="bg-slate-50 border-slate-200 text-slate-800 placeholder:text-slate-300 focus-visible:ring-1 focus-visible:ring-lime-400 focus-visible:border-lime-400 rounded-xl"
+                    onChange={(e) => setForm({ ...form, position: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Status</label>
+                  <select
+                    className="w-full h-9 px-3 rounded-xl text-sm font-medium bg-slate-50 border border-slate-200 text-slate-700 outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-400"
+                    onChange={(e) => setForm({ ...form, status: e.target.value })}
+                  >
+                    <option value="Terkirim">Terkirim</option>
+                    <option value="Rencana">Rencana</option>
+                    <option value="Wawancara">Wawancara</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Sumber</label>
+                  <select
+                    className="w-full h-9 px-3 rounded-xl text-sm font-medium bg-slate-50 border border-slate-200 text-slate-700 outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-400"
+                    onChange={(e) => setForm({ ...form, source: e.target.value })}
+                  >
+                    <option value="LinkedIn">LinkedIn</option>
+                    <option value="Instagram">Instagram</option>
+                    <option value="Email">Email</option>
+                    <option value="Form">Google Form</option>
+                    <option value="Lainnya">Lainnya</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div>
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Link Postingan</label>
+                  <div className="relative">
+                    <LinkIcon size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                    <Input
+                      placeholder="https://..."
+                      className="pl-9 bg-slate-50 border-slate-200 text-slate-800 placeholder:text-slate-300 focus-visible:ring-1 focus-visible:ring-lime-400 focus-visible:border-lime-400 rounded-xl"
+                      onChange={(e) => setForm({ ...form, linkPostingan: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">URL Foto Poster</label>
+                  <div className="relative">
+                    <ImageIcon size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                    <Input
+                      placeholder="https://i.imgur.com/..."
+                      className="pl-9 bg-slate-50 border-slate-200 text-slate-800 placeholder:text-slate-300 focus-visible:ring-1 focus-visible:ring-lime-400 focus-visible:border-lime-400 rounded-xl"
+                      onChange={(e) => setForm({ ...form, fotoPoster: e.target.value })}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full font-bold gap-2 mt-2 transition-all duration-200 hover:-translate-y-0.5 text-white rounded-xl shadow-sm"
+                style={{ background: LIME, border: "none" }}
+              >
+                <Save size={15} /> Simpan Lamaran
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
